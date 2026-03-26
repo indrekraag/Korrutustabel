@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Kosmose korrutuskoloonia — puhas versioon</title>
+  <style>
+    :root{
+      --bg:#020617;
+      --bg2:#0f172a;
+      --panel:rgba(15,23,42,.92);
+      --panel2:rgba(30,41,59,.86);
+      --text:#e5eefb;
+      --muted:#94a3b8;
+      --accent:#38bdf8;
+      --accent2:#22d3ee;
+      --good:#34d399;
+      --bad:#fb7185;
+      --warning:#fbbf24;
+      --shadow:0 16px 36px rgba(0,0,0,.34);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text)}
+    body{
+      min-height:100vh;padding:12px;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(56,189,248,.16), transparent 20%),
+        radial-gradient(circle at 85% 12%, rgba(34,211,238,.10), transparent 22%),
+        linear-gradient(180deg, #020617 0%, #0b1220 45%, #111827 100%);
+    }
+    .app{max-width:1220px;margin:0 auto}
+        .stat,.card{background:var(--panel);border:1px solid rgba(148,163,184,.14);box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+    .stat{padding:16px 18px;border-radius:22px;display:flex;justify-content:space-between;align-items:center;min-height:86px}
+    .label{color:var(--muted);font-size:14px}
+    .value{font-size:32px;font-weight:900}
+    .emoji{font-size:30px}
+    .layout{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    .card{border-radius:30px;padding:18px}
+    h1,h2,h3{margin:0}
+    h1{font-size:32px;line-height:1.05}
+    h2{font-size:22px}
+    h3{font-size:18px}
+    p{margin:0;color:var(--muted)}
+    .title-row,.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:flex-start}
+    .row.start{justify-content:flex-start}
+    .badge,.small-btn,.mode-btn,.len-btn,.ghost-btn,.decor-btn,.tool-btn,.build-btn,.table-btn,.answer-btn{
+      border:none;cursor:pointer;font:inherit;color:var(--text);
+      background:rgba(15,23,42,.92);
+      border:1px solid rgba(148,163,184,.22);
+      border-radius:18px;
+      transition:transform .12s ease, background .12s ease, opacity .12s ease;
+    }
+    button:active{transform:scale(.98)}
+    .badge,.small-btn,.mode-btn,.len-btn,.ghost-btn,.decor-btn,.tool-btn{padding:12px 16px;font-weight:800}
+    .small-btn.active,.mode-btn.active,.len-btn.active,.table-btn.active{
+      background:rgba(8,47,73,.95);
+      border-color:var(--accent);
+      color:#e0f2fe;
+    }
+    .screen.hidden{display:none !important}
+    .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+    .subcard{background:rgba(15,23,42,.74);border-radius:24px;padding:16px}
+    .tables{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}
+    .table-btn{min-height:56px;font-size:22px;font-weight:900}
+    .info-box{
+      margin-top:14px;padding:14px;border-radius:18px;
+      background:rgba(15,23,42,.72);
+      border:1px solid rgba(148,163,184,.18);
+      color:var(--muted);font-size:14px;line-height:1.4
+    }
+    .highlight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+    .highlight{border-radius:22px;padding:14px;min-height:96px}
+    .highlight:nth-child(1){background:rgba(120,53,15,.28)}
+    .highlight:nth-child(2){background:rgba(6,78,59,.30)}
+    .highlight:nth-child(3){background:rgba(30,64,175,.22)}
+    .main-btn{
+      width:100%;min-height:64px;border:none;border-radius:24px;margin-top:16px;cursor:pointer;
+      background:linear-gradient(135deg, #0f3b63, #155e75);color:white;font-size:22px;font-weight:900;
+      box-shadow:0 16px 30px rgba(0,0,0,.32)
+    }
+    .game-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+
+    .status-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    .status-chip{
+      background:rgba(15,23,42,.78);border-radius:999px;padding:8px 11px;font-size:13px;font-weight:800;
+      border:1px solid rgba(148,163,184,.22)
+    }
+    .mode-note{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.45}
+
+    .pill{
+      background:rgba(15,23,42,.78);border-radius:999px;padding:9px 12px;font-size:14px;font-weight:800;
+      border:1px solid rgba(148,163,184,.22)
+    }
+    .progress{width:100%;height:12px;border-radius:999px;background:rgba(71,85,105,.45);overflow:hidden;margin-bottom:14px}
+    .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .22s ease}
+    .question-box{
+      border-radius:34px;background:linear-gradient(135deg,#0f3b63,#155e75);
+      color:white;padding:24px 18px;text-align:center;box-shadow:0 16px 30px rgba(0,0,0,.32);margin-bottom:14px
+    }
+    .question-small{font-size:18px;opacity:.95}
+    .question-big{font-size:clamp(54px,10vw,88px);line-height:1;font-weight:900;letter-spacing:-.03em;margin:16px 0}
+    .tools-row{display:flex;justify-content:flex-end;margin-bottom:10px}
+    .tool-btn{background:linear-gradient(135deg, #1d4ed8, #06b6d4);color:white}
+    .tool-btn[disabled]{opacity:.45;cursor:not-allowed}
+    .answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .answer-btn{min-height:88px;font-size:34px;font-weight:900;box-shadow:0 12px 22px rgba(0,0,0,.30)}
+    .answer-btn.dim{opacity:.24;pointer-events:none}
+    .feedback{margin-top:14px;border-radius:18px;padding:14px;text-align:center;font-size:18px;font-weight:900}
+    .feedback.good{background:rgba(6,95,70,.30);color:#a7f3d0}
+    .feedback.bad{background:rgba(127,29,29,.30);color:#fecaca}
+    .summary-banner{
+      border-radius:28px;background:linear-gradient(135deg,#14532d,#0f766e);
+      color:white;padding:20px;box-shadow:0 14px 28px rgba(0,0,0,.30)
+    }
+    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+    .summary-stat{background:rgba(15,23,42,.30);border-radius:18px;padding:14px}
+    .summary-stat .big{font-size:34px;font-weight:900}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border-radius:999px;
+      background:rgba(15,23,42,.72);border:1px solid rgba(148,163,184,.18);font-size:14px;font-weight:800
+    }
+    .side-stack{display:grid;gap:14px}
+    .space-panel{
+      border-radius:26px;min-height:260px;padding:16px;position:relative;overflow:hidden;
+      background:linear-gradient(180deg, #020617 0%, #082f49 48%, #0f172a 100%)
+    }
+    .starfield{
+      position:absolute;inset:0;pointer-events:none;opacity:.85;
+      background-image:
+        radial-gradient(circle at 10% 12%, white 0 1px, transparent 1.8px),
+        radial-gradient(circle at 20% 24%, #e0f2fe 0 1.2px, transparent 1.9px),
+        radial-gradient(circle at 34% 18%, white 0 1.1px, transparent 1.8px),
+        radial-gradient(circle at 48% 12%, #bae6fd 0 1.2px, transparent 2px),
+        radial-gradient(circle at 62% 20%, white 0 1px, transparent 1.8px),
+        radial-gradient(circle at 76% 11%, #dbeafe 0 1.2px, transparent 1.9px),
+        radial-gradient(circle at 88% 25%, white 0 1px, transparent 1.8px);
+    }
+    .world-grid{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:10px;position:relative;z-index:1
+    }
+    .world-slot{
+      min-height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+      font-size:32px;background:rgba(255,255,255,.12);border:1px dashed rgba(255,255,255,.28)
+    }
+    .world-slot.built{
+      background:rgba(226,232,240,.92);color:#020617;border:none;box-shadow:0 10px 16px rgba(2,6,23,.18)
+    }
+    .section-help{margin-top:6px;color:var(--muted);font-size:13px}
+    .build-list,.decor-list{
+      display:grid;gap:10px;margin-top:14px;max-height:360px;overflow-y:auto;padding-right:4px
+    }
+    .build-list::-webkit-scrollbar,.decor-list::-webkit-scrollbar{width:10px}
+    .build-list::-webkit-scrollbar-track,.decor-list::-webkit-scrollbar-track{background:rgba(148,163,184,.12);border-radius:999px}
+    .build-list::-webkit-scrollbar-thumb,.decor-list::-webkit-scrollbar-thumb{background:rgba(56,189,248,.45);border-radius:999px}
+    .build-item,.decor-item{
+      display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;border-radius:18px;
+      background:rgba(15,23,42,.6);border:1px solid rgba(148,163,184,.16)
+    }
+    .build-meta{display:flex;gap:12px;align-items:center}
+    .build-icon{font-size:28px}
+    .build-btn{
+      padding:12px 14px;border-radius:16px;font-weight:800;min-width:96px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));color:#02131d
+    }
+    .build-btn[disabled],.decor-btn[disabled]{opacity:.45;cursor:not-allowed}
+    .mastery-row{margin-bottom:10px}
+    .mastery-head{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;font-weight:800}
+    .tiny-progress{height:10px;border-radius:999px;background:rgba(71,85,105,.45);overflow:hidden}
+    .tiny-progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#22c55e)}
+    .footer-actions{display:flex;gap:10px}
+    .decor-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .decor-badge{padding:8px 10px;border-radius:999px;background:rgba(15,23,42,.72);border:1px solid rgba(148,163,184,.18);font-size:13px;font-weight:800}
+    @media (max-width:980px){
+      .layout{grid-template-columns:1fr}
+    }
+    @media (max-width:720px){
+      body{padding:10px}
+      .menu-grid,.highlight-grid,.summary-grid{grid-template-columns:1fr}
+      .answers{grid-template-columns:1fr 1fr}
+      h1{font-size:28px}
+      .value{font-size:30px}
+    }
+  </style>
+
+  <link rel="manifest" href="app.webmanifest">
+  <meta name="theme-color" content="#020617">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+</head>
+<body>
+  <div class="app">
+    <div class="layout">
+      <div class="card">
+        <div class="title-row">
+          <div>
+            <h1>Kosmose korrutuskoloonia</h1>
+            <p>Lahenda tehteid, kogu tähti ja münte ning ehita omaenda kosmosebaas.</p>
+          </div>
+          <div class="row">
+            <div class="badge">Eesti keeles</div>
+            <button class="small-btn active" id="soundToggle">🔊 Heli sees</button>
+          </div>
+        </div>
+        <div class="status-strip">
+          <div class="status-chip">Tähed: <span id="starsValue">0</span> ⭐</div>
+          <div class="status-chip">Mündid: <span id="coinsValue">0</span> 🪙</div>
+          <div class="status-chip">Koloonia: <span id="builtValue">0/16</span></div>
+          <div class="status-chip">Dekoratsioonid: <span id="decorValue">0/8</span></div>
+        </div>
+
+        <section id="menuScreen" class="screen">
+          <div class="menu-grid">
+            <div class="subcard">
+              <h3>1. Vali korrutustabelid</h3>
+              <div class="tables" id="tablesGrid"></div>
+              <div class="info-box" id="selectedTablesText"></div>
+            </div>
+            <div class="subcard">
+              <h3>2. Vali mängurežiim</h3>
+              <div class="row start" id="modeRow" style="margin-top:12px"></div>
+              <h3 style="margin-top:16px">3. Küsimuste arv</h3>
+              <div class="row start" id="lengthRow" style="margin-top:12px"></div>
+              <div class="info-box" id="modeInfo"></div>
+            </div>
+          </div>
+
+          <div class="highlight-grid">
+            <div class="highlight"><h3>✨ Jada</h3><p>Mitu õiget järjest annab rohkem tähti ja münte.</p></div>
+            <div class="highlight"><h3>🏗️ Koloonia</h3><p>Tähed on põhiehitiste jaoks. Mündid on abivahendite ja dekoratsioonide jaoks.</p></div>
+            <div class="highlight"><h3>🧠 Õppiv mäng</h3><p>Valesti läinud tehted jäävad meelde ja tulevad hiljem natuke sagedamini tagasi.</p></div>
+          </div>
+
+          <button class="main-btn" id="startBtn">Alusta mängu</button>
+        </section>
+
+        <section id="gameScreen" class="screen hidden">
+          <div class="game-meta">
+            <div class="row start">
+              <div class="pill">Elud: <span id="heartsText">3</span> ❤️</div>
+              <div class="pill">Küsimus: <span id="questionCount">1 / 10</span></div>
+            </div>
+            <div class="row start">
+              <div class="pill">Jada: <span id="comboValue">0</span></div>
+              <div class="pill">Täpsus: <span id="accuracyValue">100</span>%</div>
+              <div class="pill" id="timerPill">Aeg: <span id="timerText">—</span></div>
+              <div class="pill">Tähed: <span id="starsGame">0</span> ⭐</div>
+              <div class="pill">Mündid: <span id="coinsGame">0</span> 🪙</div>
+            </div>
+          </div>
+
+          <div class="progress"><div id="mainProgress"></div></div>
+          <div class="progress" id="timerBarWrap"><div id="timerBar"></div></div>
+
+          <div class="tools-row">
+            <button class="tool-btn" id="fiftyBtn">50/50 · 35 münti</button>
+          </div>
+
+          <div class="question-box">
+            <div class="question-small">Mis on</div>
+            <div class="question-big" id="questionText">2 × 8</div>
+            <div class="question-small">Vali õige vastus</div>
+          </div>
+
+          <div class="answers" id="answersGrid"></div>
+          <div id="feedbackBox" class="feedback hidden"></div>
+        </section>
+
+        <section id="summaryScreen" class="screen hidden">
+          <div class="summary-banner">
+            <div style="font-size:18px; opacity:.92">Voor on läbi</div>
+            <div style="font-size:46px; font-weight:900; line-height:1.02; margin-top:6px">Tubli töö</div>
+            <div class="summary-grid">
+              <div class="summary-stat"><div>Õigeid</div><div class="big" id="summaryCorrect">0</div></div>
+              <div class="summary-stat"><div>Parim jada</div><div class="big" id="summaryCombo">0</div></div>
+              <div class="summary-stat"><div>Tasu</div><div class="big"><span id="summaryStars">0</span>⭐ / <span id="summaryCoins">0</span>🪙</div></div>
+            </div>
+          </div>
+
+          <div class="info-box" id="roundInfo"></div>
+
+          <div id="mistakesWrap" style="margin-top:14px">
+            <h3>Selles voorus valesti läinud</h3>
+            <div class="chips" id="mistakesChips" style="margin-top:10px"></div>
+          </div>
+
+          <div id="weakWrap" style="margin-top:14px">
+            <h3>Kõige nõrgemad tehted</h3>
+            <div class="chips" id="weakChips" style="margin-top:10px"></div>
+          </div>
+
+          <div class="footer-actions" style="margin-top:14px">
+            <button class="main-btn" style="margin-top:0; min-height:56px; font-size:20px" id="newRoundBtn">Uus voor</button>
+            <button class="ghost-btn" id="backToMenuBtn">Tagasi menüüsse</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="side-stack">
+        <div class="card">
+          <h2>🏠 Sinu koloonia</h2>
+          <div class="space-panel">
+            <div class="starfield"></div>
+            <div class="world-grid" id="worldGrid"></div>
+          </div>
+
+          <div class="section-help">Põhiehitised ostetakse tähtede eest.</div>
+          <div class="info-box" id="nextUnlockText"></div>
+          <div class="build-list" id="buildList"></div>
+        </div>
+
+        <div class="card">
+          <h2>✨ Dekoratsioonid ja lisad</h2>
+          <div class="section-help">Need ostetakse müntide eest. 50/50 kasutab samuti münte.</div>
+          <div class="decor-preview" id="decorPreview"></div>
+          <div class="decor-list" id="decorList"></div>
+        </div>
+
+        <div class="card">
+          <h2>📈 Tabelite tase</h2>
+          <div id="masteryList"></div>
+        </div>
+
+        <div class="card">
+          <div class="footer-actions">
+            <button class="ghost-btn" id="menuBtn">Menüü</button>
+            <button class="ghost-btn" id="resetBtn">Nulli</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const TABLES = [1,2,3,4,5,6,7,8,9,10];
+const WORLD_ITEMS = [
+  { id: 1, name: "Päikesepaneel", cost: 4, icon: "🔆" },
+  { id: 2, name: "Energiapuu", cost: 6, icon: "🌌" },
+  { id: 3, name: "Elumoodul", cost: 10, icon: "🛖" },
+  { id: 4, name: "Kasvuhoone", cost: 12, icon: "🪴" },
+  { id: 5, name: "Radar", cost: 16, icon: "📡" },
+  { id: 6, name: "Kosmotorn", cost: 20, icon: "🗼" },
+  { id: 7, name: "Tähejaam", cost: 28, icon: "🛰️" },
+  { id: 8, name: "Kristalljärv", cost: 32, icon: "💎" },
+  { id: 9, name: "Valgussild", cost: 36, icon: "🌠" },
+  { id: 10, name: "Kosmosesadam", cost: 45, icon: "🚀" },
+  { id: 11, name: "Robotitehas", cost: 52, icon: "🤖" },
+  { id: 12, name: "Tähetorn", cost: 60, icon: "🔭" },
+  { id: 13, name: "Orbitaaljaam", cost: 72, icon: "🛸" },
+  { id: 14, name: "Kristallreaktor", cost: 84, icon: "⚛️" },
+  { id: 15, name: "Teleportvärav", cost: 96, icon: "🌀" },
+  { id: 16, name: "Galaktikapalee", cost: 120, icon: "👑" }
+];
+const DECOR_ITEMS = [
+  { id: "flag", name: "Koloonia lipp", cost: 40, icon: "🏁" },
+  { id: "lights", name: "Neoontuled", cost: 55, icon: "💡" },
+  { id: "satellite", name: "Mini-satelliit", cost: 70, icon: "🛰️" },
+  { id: "drone", name: "Aiadroon", cost: 85, icon: "🚁" },
+  { id: "sculpture", name: "Kristallskulptuur", cost: 95, icon: "🗿" },
+  { id: "arch", name: "Valguskaar", cost: 110, icon: "🌈" },
+  { id: "telescope", name: "Vaatlusteleskoop", cost: 125, icon: "🔭" },
+  { id: "lanterns", name: "Orbiidilaternad", cost: 145, icon: "🏮" }
+];
+const MODES = {
+  lihtne: {
+    label: "Tahvlisahistaja",
+    seconds: 0,
+    starMult: 1.0,
+    coinMult: 1.0,
+    desc: "Rahulik harjutus. Taimerit ei ole. Sobib uue tabeli õppimiseks."
+  },
+  keskmine: {
+    label: "Vihikuvälgutaja",
+    seconds: 10,
+    starMult: 1.45,
+    coinMult: 1.45,
+    desc: "Iga küsimuse jaoks on 10 sekundit. Rohkem punkte, aga peab juba nobedam olema."
+  },
+  kiire: {
+    label: "Kriiditšempion",
+    seconds: 5,
+    starMult: 1.95,
+    coinMult: 1.95,
+    desc: "Ainult 5 sekundit küsimuse kohta. Suurem risk, aga ka korralikult parem saak."
+  },
+  super: {
+    label: "Supermatemaatik",
+    seconds: 3,
+    starMult: 2.7,
+    coinMult: 2.7,
+    desc: "3 sekundit küsimuse kohta. Väga karm tempo, aga kõige kõrgemad punktid."
+  }
+};
+const FIFTY_COST = 35;
+
+const state = {
+  screen: "menu",
+  selectedTables: [2,3,4],
+  roundLength: 10,
+  mode: "lihtne",
+  soundOn: true,
+  stars: 0,
+  coins: 0,
+  built: [],
+  decorOwned: [],
+  mastery: {},
+  weakFacts: {},
+  hearts: 3,
+  questionIndex: 0,
+  correctCount: 0,
+  combo: 0,
+  bestCombo: 0,
+  wrongAnswers: [],
+  question: null,
+  locked: false,
+  fiftyUsed: false,
+  timerRemaining: 0,
+  timerDuration: 0,
+  timerInterval: null
+};
+
+const $ = (id) => document.getElementById(id);
+
+function save() {
+  localStorage.setItem("kosmose-korrutuskoloonia-clean-v2", JSON.stringify({
+    selectedTables: state.selectedTables,
+    roundLength: state.roundLength,
+    mode: state.mode,
+    soundOn: state.soundOn,
+    stars: state.stars,
+    coins: state.coins,
+    built: state.built,
+    decorOwned: state.decorOwned,
+    mastery: state.mastery,
+    weakFacts: state.weakFacts
+  }));
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem("kosmose-korrutuskoloonia-clean-v2");
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (Array.isArray(data.selectedTables) && data.selectedTables.length) state.selectedTables = data.selectedTables;
+    if (data.roundLength) state.roundLength = data.roundLength;
+    if (data.mode) if (data.mode && MODES[data.mode]) state.mode = data.mode;
+    if (typeof data.soundOn === "boolean") state.soundOn = data.soundOn;
+    if (typeof data.stars === "number") state.stars = data.stars;
+    if (typeof data.coins === "number") state.coins = data.coins;
+    if (Array.isArray(data.built)) state.built = data.built;
+    if (Array.isArray(data.decorOwned)) state.decorOwned = data.decorOwned;
+    if (data.mastery) state.mastery = data.mastery;
+    if (data.weakFacts) state.weakFacts = data.weakFacts;
+  } catch (e) {}
+}
+
+function audioContext() {
+  const A = window.AudioContext || window.webkitAudioContext;
+  if (!A) return null;
+  if (!window.__mathAudio) window.__mathAudio = new A();
+  const ctx = window.__mathAudio;
+  if (ctx.state === "suspended") ctx.resume();
+  return ctx;
+}
+
+function tone(freq=440, duration=0.08, type="triangle", gainValue=0.03) {
+  if (!state.soundOn) return;
+  const ctx = audioContext();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const now = ctx.currentTime;
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.value = gainValue;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(now);
+  gain.gain.setValueAtTime(gainValue, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  osc.stop(now + duration);
+}
+function sStart(){ tone(520,.05); setTimeout(()=>tone(720,.07),40); }
+function sGood(){ tone(680,.05); setTimeout(()=>tone(920,.06),50); }
+function sBad(){ tone(240,.11,"sawtooth"); }
+function sBuy(){ tone(700,.04); setTimeout(()=>tone(900,.04),40); setTimeout(()=>tone(1120,.08),80); }
+
+function shuffle(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function factKey(a, b) {
+  return `${a}x${b}`;
+}
+
+function masteryLabel(score) {
+  if (score >= 90) return "Meister";
+  if (score >= 70) return "Tubli";
+  if (score >= 40) return "Harjutab";
+  return "Algus";
+}
+
+function accuracy() {
+  return state.questionIndex > 0 ? Math.round((state.correctCount / state.questionIndex) * 100) : 100;
+}
+
+function weightedWeakFact() {
+  const available = Object.entries(state.weakFacts)
+    .filter(([key, weight]) => weight > 0 && state.selectedTables.includes(Number(key.split("x")[0])));
+  if (!available.length) return null;
+
+  const total = available.reduce((sum, [, weight]) => sum + weight, 0);
+  let pick = Math.random() * total;
+  for (const [key, weight] of available) {
+    pick -= weight;
+    if (pick <= 0) {
+      const [a, b] = key.split("x").map(Number);
+      return { a, b };
+    }
+  }
+  const [a, b] = available[available.length - 1][0].split("x").map(Number);
+  return { a, b };
+}
+
+function smartDistractors(a, b, correct) {
+  const candidates = new Set();
+  const push = (n) => {
+    if (Number.isInteger(n) && n > 0 && n <= 100 && n !== correct) candidates.add(n);
+  };
+
+  push(a * (b - 1));
+  push(a * (b + 1));
+  push((a - 1) * b);
+  push((a + 1) * b);
+  push(correct - a);
+  push(correct + a);
+  push(correct - b);
+  push(correct + b);
+  if (b > 2) push(a * (b - 2));
+  push(a * (b + 2));
+  if (a > 1) push((a - 1) * (b + 1));
+  push((a + 1) * (b - 1));
+  push(correct + 10);
+  push(correct - 10);
+
+  const pool = [...candidates];
+  const selected = [];
+  while (selected.length < 3 && pool.length) {
+    const i = Math.floor(Math.random() * pool.length);
+    selected.push(pool.splice(i, 1)[0]);
+  }
+
+  let offset = 1;
+  while (selected.length < 3) {
+    const low = correct - offset;
+    const high = correct + offset;
+    if (low > 0 && low !== correct && !selected.includes(low)) selected.push(low);
+    if (selected.length < 3 && high <= 100 && high !== correct && !selected.includes(high)) selected.push(high);
+    offset += 1;
+  }
+
+  return shuffle([correct, ...selected.slice(0,3)]);
+}
+
+function validateChoices(correct, choices) {
+  const unique = [...new Set(choices.filter(n => Number.isInteger(n) && n > 0 && n <= 100))];
+  if (!unique.includes(correct)) unique[0] = correct;
+  const deduped = [...new Set(unique)];
+  let offset = 1;
+  while (deduped.length < 4) {
+    const low = correct - offset;
+    const high = correct + offset;
+    if (low > 0 && !deduped.includes(low)) deduped.push(low);
+    if (deduped.length < 4 && high <= 100 && !deduped.includes(high)) deduped.push(high);
+    offset += 1;
+  }
+  return shuffle(deduped.slice(0,4));
+}
+
+function makeQuestion() {
+  let a, b;
+  if (Math.random() < 0.42) {
+    const weak = weightedWeakFact();
+    if (weak) {
+      a = weak.a;
+      b = weak.b;
+    }
+  }
+  if (!a || !b) {
+    a = state.selectedTables[Math.floor(Math.random() * state.selectedTables.length)];
+    b = Math.floor(Math.random() * 10) + 1;
+  }
+  const correct = a * b;
+  const choices = validateChoices(correct, smartDistractors(a, b, correct));
+  return {
+    a,
+    b,
+    correct,
+    choices,
+    key: factKey(a, b)
+  };
+}
+
+function updateMastery(a, isCorrect) {
+  const current = state.mastery[a] || { correct: 0, total: 0 };
+  current.total += 1;
+  if (isCorrect) current.correct += 1;
+  state.mastery[a] = current;
+}
+
+function updateWeakFact(key, isCorrect) {
+  const current = state.weakFacts[key] || 0;
+  state.weakFacts[key] = isCorrect ? Math.max(0, current - 1) : current + 2;
+}
+
+function rewardForRound() {
+  const baseStars = Math.max(2, state.correctCount + Math.floor(state.bestCombo / 2));
+  const baseCoins = Math.max(1, Math.floor(state.correctCount * 1.4) + Math.floor(state.bestCombo / 2));
+  const mode = MODES[state.mode];
+  return {
+    stars: Math.max(2, Math.round(baseStars * mode.starMult)),
+    coins: Math.max(1, Math.round(baseCoins * mode.coinMult))
+  };
+}
+
+function setScreen(name) {
+  state.screen = name;
+  $("menuScreen").classList.toggle("hidden", name !== "menu");
+  $("gameScreen").classList.toggle("hidden", name !== "game");
+  $("summaryScreen").classList.toggle("hidden", name !== "summary");
+}
+
+function renderTop() {
+  $("starsValue").textContent = state.stars;
+  $("coinsValue").textContent = state.coins;
+  $("builtValue").textContent = `${state.built.length}/${WORLD_ITEMS.length}`;
+  $("decorValue").textContent = `${state.decorOwned.length}/${DECOR_ITEMS.length}`;
+  const sg = document.getElementById("starsGame");
+  const cg = document.getElementById("coinsGame");
+  if (sg) sg.textContent = state.stars;
+  if (cg) cg.textContent = state.coins;
+  $("soundToggle").textContent = state.soundOn ? "🔊 Heli sees" : "🔈 Heli väljas";
+  $("soundToggle").classList.toggle("active", state.soundOn);
+}
+
+function renderMenu() {
+  const tablesGrid = $("tablesGrid");
+  tablesGrid.innerHTML = "";
+  TABLES.forEach(n => {
+    const btn = document.createElement("button");
+    btn.className = `table-btn ${state.selectedTables.includes(n) ? "active" : ""}`;
+    btn.textContent = `×${n}`;
+    btn.onclick = () => {
+      if (state.selectedTables.includes(n)) {
+        if (state.selectedTables.length === 1) return;
+        state.selectedTables = state.selectedTables.filter(x => x !== n);
+      } else {
+        state.selectedTables = [...state.selectedTables, n].sort((a,b)=>a-b);
+      }
+      save();
+      renderMenu();
+    };
+    tablesGrid.appendChild(btn);
+  });
+  $("selectedTablesText").textContent = `Valitud: ${state.selectedTables.map(n => `×${n}`).join(", ")}`;
+
+  const modeRow = $("modeRow");
+  modeRow.innerHTML = "";
+  ["lihtne","keskmine","kiire","super"].forEach(mode => {
+    const btn = document.createElement("button");
+    btn.className = `mode-btn ${state.mode === mode ? "active" : ""}`;
+    btn.textContent = MODES[mode].label;
+    btn.onclick = () => {
+      state.mode = mode;
+      save();
+      renderMenu();
+    };
+    modeRow.appendChild(btn);
+  });
+
+  const lengthRow = $("lengthRow");
+  lengthRow.innerHTML = "";
+  [10,15,20].forEach(len => {
+    const btn = document.createElement("button");
+    btn.className = `len-btn ${state.roundLength === len ? "active" : ""}`;
+    btn.textContent = len;
+    btn.onclick = () => {
+      state.roundLength = len;
+      save();
+      renderMenu();
+    };
+    lengthRow.appendChild(btn);
+  });
+
+  $("modeInfo").innerHTML = `<strong style="color:var(--text)">${MODES[state.mode].label}</strong><div class="mode-note">${MODES[state.mode].desc}</div>`;
+  const timerPill = document.getElementById("timerPill");
+  const timerWrap = document.getElementById("timerBarWrap");
+  if (timerPill) timerPill.style.display = MODES[state.mode].seconds ? "" : "none";
+  if (timerWrap) timerWrap.style.display = MODES[state.mode].seconds ? "" : "none";
+}
+
+
+function clearQuestionTimer() {
+  if (state.timerInterval) {
+    clearInterval(state.timerInterval);
+    state.timerInterval = null;
+  }
+}
+
+function startQuestionTimer() {
+  clearQuestionTimer();
+  const mode = MODES[state.mode];
+  state.timerDuration = mode.seconds || 0;
+  state.timerRemaining = state.timerDuration;
+  const timerPill = document.getElementById("timerPill");
+  const timerWrap = document.getElementById("timerBarWrap");
+  if (!mode.seconds) {
+    if (timerPill) timerPill.style.display = "none";
+    if (timerWrap) timerWrap.style.display = "none";
+    return;
+  }
+  if (timerPill) timerPill.style.display = "";
+  if (timerWrap) timerWrap.style.display = "";
+  renderTimer();
+  const started = Date.now();
+  state.timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - started) / 1000;
+    state.timerRemaining = Math.max(0, state.timerDuration - elapsed);
+    renderTimer();
+    if (state.timerRemaining <= 0) {
+      clearQuestionTimer();
+      timeoutQuestion();
+    }
+  }, 100);
+}
+
+function renderTimer() {
+  const timerText = document.getElementById("timerText");
+  const timerBar = document.getElementById("timerBar");
+  if (!timerText || !timerBar) return;
+  if (!state.timerDuration) {
+    timerText.textContent = "—";
+    timerBar.style.width = "0%";
+    return;
+  }
+  timerText.textContent = state.timerRemaining.toFixed(1).replace(".", ",") + " s";
+  timerBar.style.width = `${(state.timerRemaining / state.timerDuration) * 100}%`;
+}
+
+function timeoutQuestion() {
+  if (state.locked) return;
+  state.locked = true;
+  state.questionIndex += 1;
+  updateMastery(state.question.a, false);
+  updateWeakFact(state.question.key, false);
+  state.hearts -= 1;
+  state.combo = 0;
+  state.wrongAnswers.push(`${state.question.a} × ${state.question.b} = ${state.question.correct}`);
+  showFeedback(`Aeg sai otsa. Õige oli ${state.question.correct}`, false);
+  renderTop();
+  renderQuestion();
+  const end = state.questionIndex >= state.roundLength || state.hearts <= 0;
+  setTimeout(() => {
+    hideFeedback();
+    if (end) {
+      finishRound();
+    } else {
+      state.locked = false;
+      state.fiftyUsed = false;
+      state.hiddenChoices = new Set();
+      state.question = makeQuestion();
+      renderQuestion();
+      startQuestionTimer();
+    }
+  }, 700);
+}
+
+function renderQuestion() {
+  $("heartsText").textContent = state.hearts;
+  $("questionCount").textContent = `${state.questionIndex + 1} / ${state.roundLength}`;
+  $("comboValue").textContent = state.combo;
+  $("accuracyValue").textContent = accuracy();
+  $("mainProgress").style.width = `${(state.questionIndex / state.roundLength) * 100}%`;
+  $("questionText").textContent = `${state.question.a} × ${state.question.b}`;
+  $("fiftyBtn").disabled = state.fiftyUsed || state.coins < FIFTY_COST;
+  renderTimer();
+
+  const grid = $("answersGrid");
+  grid.innerHTML = "";
+  state.question.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.className = "answer-btn";
+    if (state.hiddenChoices.has(choice)) btn.classList.add("dim");
+    btn.textContent = choice;
+    btn.dataset.value = String(choice);
+    btn.disabled = state.locked;
+    btn.onclick = () => answer(choice, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function renderWorld() {
+  const worldGrid = $("worldGrid");
+  worldGrid.innerHTML = "";
+  WORLD_ITEMS.forEach(item => {
+    const slot = document.createElement("div");
+    slot.className = `world-slot ${state.built.includes(item.id) ? "built" : ""}`;
+    slot.textContent = state.built.includes(item.id) ? item.icon : "❔";
+    worldGrid.appendChild(slot);
+  });
+
+  const next = WORLD_ITEMS.find(item => !state.built.includes(item.id));
+  $("nextUnlockText").textContent = next
+    ? `Järgmine avamine: ${next.name} (${next.cost} tähte).`
+    : "Kõik põhihooned on valmis.";
+
+  const buildList = $("buildList");
+  buildList.innerHTML = "";
+  const pending = WORLD_ITEMS.filter(item => !state.built.includes(item.id));
+  const done = WORLD_ITEMS.filter(item => state.built.includes(item.id));
+  [...pending, ...done].forEach(item => {
+    const row = document.createElement("div");
+    row.className = "build-item";
+
+    const meta = document.createElement("div");
+    meta.className = "build-meta";
+    meta.innerHTML = `<div class="build-icon">${item.icon}</div><div><div style="font-weight:800">${item.name}</div><div style="font-size:12px;color:var(--muted)">Maksab ${item.cost} tähte</div></div>`;
+
+    const btn = document.createElement("button");
+    const unlocked = state.built.includes(item.id);
+    const affordable = state.stars >= item.cost;
+    btn.className = "build-btn";
+    btn.textContent = unlocked ? "Valmis" : (affordable ? "Ehita nüüd" : "Lukus");
+    btn.disabled = unlocked || !affordable;
+    btn.onclick = () => buildItem(item.id);
+
+    row.appendChild(meta);
+    row.appendChild(btn);
+    buildList.appendChild(row);
+  });
+}
+
+function renderDecor() {
+  const preview = $("decorPreview");
+  preview.innerHTML = "";
+  if (!state.decorOwned.length) {
+    const badge = document.createElement("div");
+    badge.className = "decor-badge";
+    badge.textContent = "Dekoratsioone veel ei ole";
+    preview.appendChild(badge);
+  } else {
+    state.decorOwned.forEach(id => {
+      const item = DECOR_ITEMS.find(x => x.id === id);
+      if (!item) return;
+      const badge = document.createElement("div");
+      badge.className = "decor-badge";
+      badge.textContent = `${item.icon} ${item.name}`;
+      preview.appendChild(badge);
+    });
+  }
+
+  const list = $("decorList");
+  list.innerHTML = "";
+  DECOR_ITEMS.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "decor-item";
+
+    const meta = document.createElement("div");
+    meta.className = "build-meta";
+    meta.innerHTML = `<div class="build-icon">${item.icon}</div><div><div style="font-weight:800">${item.name}</div><div style="font-size:12px;color:var(--muted)">Maksab ${item.cost} münti</div></div>`;
+
+    const btn = document.createElement("button");
+    const owned = state.decorOwned.includes(item.id);
+    btn.className = "decor-btn";
+    btn.textContent = owned ? "Olemas" : (state.coins >= item.cost ? "Osta nüüd" : "Lukus");
+    btn.disabled = owned || state.coins < item.cost;
+    btn.onclick = () => buyDecor(item.id);
+
+    row.appendChild(meta);
+    row.appendChild(btn);
+    list.appendChild(row);
+  });
+}
+
+function renderMastery() {
+  const list = $("masteryList");
+  list.innerHTML = "";
+  TABLES.forEach(n => {
+    const data = state.mastery[n] || { correct: 0, total: 0 };
+    const pct = data.total ? Math.round((data.correct / data.total) * 100) : 0;
+    const row = document.createElement("div");
+    row.className = "mastery-row";
+    row.innerHTML = `<div class="mastery-head"><span>×${n}</span><span>${masteryLabel(pct)}</span></div><div class="tiny-progress"><div style="width:${pct}%"></div></div>`;
+    list.appendChild(row);
+  });
+}
+
+function showFeedback(text, good) {
+  const box = $("feedbackBox");
+  box.textContent = text;
+  box.className = `feedback ${good ? "good" : "bad"}`;
+  box.classList.remove("hidden");
+}
+
+function hideFeedback() {
+  const box = $("feedbackBox");
+  box.classList.add("hidden");
+  box.textContent = "";
+}
+
+function applyFifty() {
+  if (state.locked || state.fiftyUsed || state.coins < FIFTY_COST) return;
+  const wrongChoices = state.question.choices.filter(v => v !== state.question.correct);
+  const toHide = shuffle(wrongChoices).slice(0, 2);
+  state.coins -= FIFTY_COST;
+  state.fiftyUsed = true;
+  state.hiddenChoices = new Set(toHide);
+  save();
+  renderTop();
+  renderQuestion();
+}
+
+function startGame() {
+  state.hearts = state.mode === "välk" ? 2 : 3;
+  state.questionIndex = 0;
+  state.correctCount = 0;
+  state.combo = 0;
+  state.bestCombo = 0;
+  state.wrongAnswers = [];
+  state.locked = false;
+  state.fiftyUsed = false;
+  state.hiddenChoices = new Set();
+  state.question = makeQuestion();
+  sStart();
+  hideFeedback();
+  setScreen("game");
+  renderTop();
+  renderQuestion();
+  renderWorld();
+  renderDecor();
+  renderMastery();
+  startQuestionTimer();
+}
+
+function finishRound() {
+  clearQuestionTimer();
+  const reward = rewardForRound();
+  state.stars += reward.stars;
+  state.coins += reward.coins;
+  save();
+
+  $("summaryCorrect").textContent = state.correctCount;
+  $("summaryCombo").textContent = state.bestCombo;
+  $("summaryStars").textContent = reward.stars;
+  $("summaryCoins").textContent = reward.coins;
+  $("roundInfo").textContent = `Täpsus ${accuracy()}%. Nõrgemad tehted jäävad meelde ja tulevad järgmistes mängudes natuke sagedamini tagasi.`;
+
+  const mistakes = $("mistakesChips");
+  mistakes.innerHTML = "";
+  if (state.wrongAnswers.length) {
+    state.wrongAnswers.slice(0, 10).forEach(text => {
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      chip.textContent = text;
+      mistakes.appendChild(chip);
+    });
+  } else {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.textContent = "Selles voorus vigu ei olnud";
+    mistakes.appendChild(chip);
+  }
+
+  const weak = Object.entries(state.weakFacts)
+    .filter(([, weight]) => weight > 0)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 8);
+  const weakChips = $("weakChips");
+  weakChips.innerHTML = "";
+  if (weak.length) {
+    weak.forEach(([key, weight]) => {
+      const [a,b] = key.split("x");
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      chip.textContent = `${a} × ${b} = ${Number(a) * Number(b)} · raskus ${weight}`;
+      weakChips.appendChild(chip);
+    });
+  } else {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.textContent = "Nõrku kohti veel ei ole";
+    weakChips.appendChild(chip);
+  }
+
+  setScreen("summary");
+  renderTop();
+  renderWorld();
+  renderDecor();
+  renderMastery();
+}
+
+function answer(choice, btn) {
+  if (state.locked) return;
+  if (btn.classList.contains("dim")) return;
+
+  clearQuestionTimer();
+  state.locked = true;
+  const isCorrect = choice === state.question.correct;
+  state.questionIndex += 1;
+  updateMastery(state.question.a, isCorrect);
+  updateWeakFact(state.question.key, isCorrect);
+
+  if (isCorrect) {
+    sGood();
+    state.correctCount += 1;
+    state.combo += 1;
+    state.coins += 1;
+    if (state.combo > state.bestCombo) state.bestCombo = state.combo;
+    showFeedback(state.combo >= 3 ? `Super! Jada x${state.combo}` : "Õige!", true);
+  } else {
+    sBad();
+    state.hearts -= 1;
+    state.combo = 0;
+    state.wrongAnswers.push(`${state.question.a} × ${state.question.b} = ${state.question.correct}`);
+    showFeedback(`Peaaegu. Õige oli ${state.question.correct}`, false);
+  }
+
+  renderTop();
+  renderQuestion();
+
+  const end = state.questionIndex >= state.roundLength || state.hearts <= 0;
+  setTimeout(() => {
+    hideFeedback();
+    if (end) {
+      finishRound();
+    } else {
+      state.locked = false;
+      state.fiftyUsed = false;
+      state.hiddenChoices = new Set();
+      state.question = makeQuestion();
+      renderQuestion();
+      startQuestionTimer();
+    }
+  }, 700);
+}
+
+function buildItem(id) {
+  const item = WORLD_ITEMS.find(x => x.id === id);
+  if (!item) return;
+  if (state.built.includes(item.id) || state.stars < item.cost) return;
+  state.stars -= item.cost;
+  state.built.push(item.id);
+  sBuy();
+  save();
+  renderTop();
+  renderWorld();
+}
+
+function buyDecor(id) {
+  const item = DECOR_ITEMS.find(x => x.id === id);
+  if (!item) return;
+  if (state.decorOwned.includes(item.id) || state.coins < item.cost) return;
+  state.coins -= item.cost;
+  state.decorOwned.push(item.id);
+  sBuy();
+  save();
+  renderTop();
+  renderDecor();
+}
+
+function resetProgress() {
+  if (!confirm("Kas nullida kogu edenemine?")) return;
+  localStorage.removeItem("kosmose-korrutuskoloonia-clean-v2");
+  location.reload();
+}
+
+function bind() {
+  $("startBtn").onclick = startGame;
+  $("newRoundBtn").onclick = startGame;
+  $("backToMenuBtn").onclick = () => { clearQuestionTimer(); setScreen("menu"); renderMenu(); };
+  $("menuBtn").onclick = () => { clearQuestionTimer(); setScreen("menu"); renderMenu(); };
+  $("resetBtn").onclick = resetProgress;
+  $("soundToggle").onclick = () => {
+    state.soundOn = !state.soundOn;
+    save();
+    renderTop();
+  };
+  $("fiftyBtn").onclick = applyFifty;
+}
+
+load();
+bind();
+setScreen("menu");
+renderTop();
+renderMenu();
+renderWorld();
+renderDecor();
+renderMastery();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+</script>
+
+</body>
+</html>
